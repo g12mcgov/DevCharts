@@ -5,6 +5,9 @@ Hi. Are you a dev? Do you like pretty charts? Do you store your code in Dropbox?
 
 Alas! DevCharts is for you (and your personal site).
 
+
+What is it
+=========
 DevCharts is a simple javascript widget to generate highcharts based on file extensions in a user's dropbox. It works by monitoring for changes in your Dropbox. It specifically looks for a given set of code-file extensions, and generates a pie chart based on the number of files it finds.
 
 This pie chart then reflects not only the amount of overall code you write but <i>the language</i> in which you write it.
