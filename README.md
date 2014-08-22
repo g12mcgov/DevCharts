@@ -1,5 +1,6 @@
 DevCharts
 =========
+!['chart_example'](http://i1158.photobucket.com/albums/p618/g12mcgov/Screenshot2014-08-22002812.png)
 
 Hi. Are you a dev? Do you like pretty charts? Do you store your code in Dropbox? Do you like to show off how much you've written <b>and</b> what you've written?
 
