@@ -14,6 +14,7 @@ $("head").append('<script type="text/javascript" src="config.js"></script>');
 $(document).ready(function () {
 	var client = new Dropbox.Client({key: client_key, secret: client_secret});
 
+
 	/* Relative Globals */
 	var counts = [];
 	var PATH = directory_path;
