@@ -10,7 +10,7 @@
 */
 
 $(document).ready(function () {
-	var client = new Dropbox.Client({key: 'i5hqf16ikib2g8b', secret: 'it274uz2nqryp01'});
+	var client = new Dropbox.Client({key: '#######', secret: '#######'});
 
 	var token = "",
 		PATH = "/Developer",
