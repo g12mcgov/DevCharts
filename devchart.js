@@ -6,25 +6,31 @@
 *	~ DevCharts ~
 *
 *
-*
 */
 
+/* Include the config file */
+$("head").append('<script type="text/javascript" src="config.js"></script>');
+
 $(document).ready(function () {
-	var client = new Dropbox.Client({key: 'i5hqf16ikib2g8b', secret: 'it274uz2nqryp01'});
+	var client = new Dropbox.Client({key: client_key, secret: client_secret});
 
-	var token = "",
-		PATH = "/Developer",
-		FILE_EXTENSIONS = [".py",".js",".cpp",".html",".h"];
+	/* Relative Globals */
+	var counts = [];
+	var PATH = directory_path;
 
-	client.authenticate(function () {
-	    if (client.isAuthenticated()) {
-			console.log("Dropbox has been authenticated");
-			token = client._oauth._token // Grab token returned
-		}
-		else {
-			alert("Login failed!");
-		} 
-	});
+	authenticate();
+	
+	function authenticate(){
+		client.authenticate(function () {
+		    if (client.isAuthenticated()) {
+				console.log("Dropbox has been authenticated");
+				token = client._oauth._token // Grab token returned
+			}
+			else {
+				alert("Login failed!");
+			} 
+		});
+	};
 
 	/* Get Account Info if we really want it */
 	function accountInfo(){
@@ -51,22 +57,6 @@ $(document).ready(function () {
 		});
 	};
 
-	var counts = [];
-
-	var count_py = python_lookup(PATH);
-	var count_js = js_lookup(PATH);
-	var count_cplus = cplus_lookup(PATH);
-	var count_erl = erlang_lookup(PATH);
-	var count_scala = scala_lookup(PATH);
-	var count_html = html_lookup(PATH);
-	var count_css = css_lookup(PATH);
-	var count_java = java_lookup(PATH);
-	var count_perl = perl_lookup(PATH);
-	var count_ruby = ruby_lookup(PATH);
-	var count_go = go_lookup(PATH);
-	var count_cs = csharp_lookup(PATH);
-
-	//look_for_files(PATH,FILE_EXTENSIONS);
 
 	function constructGraph(dataArrayFinal) {
 	    $('#container').highcharts({
@@ -75,7 +65,7 @@ $(document).ready(function () {
 	            plotShadow: false
 	        },
 	        title: {
-	            text: 'My Code Breakdown'
+	            text: chart_title // Imported from config.js
 	        },
 	        tooltip: {
 	            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -94,7 +84,7 @@ $(document).ready(function () {
 	            }
 	        },
 	        series: [{
-	        	type: 'pie',
+	        	type: chart_type,
 	        	name: 'Code Construct',
 	        	data: dataArrayFinal
 	        }]
@@ -119,7 +109,8 @@ $(document).ready(function () {
 			}
 			
 			constructGraph(dataArrayFinal);
-		},4000);
+
+		},6000);
 	};
 
 	function python_lookup(directory_path){
@@ -291,21 +282,47 @@ $(document).ready(function () {
 		});		
 	}
 
-	timeoutSet();
+	/******************************************************/
 
-	/*
+	function checkStatus(){
+		var status = true;
+		client.delta(false, function(error, changes){
+			if(error){
+				return showError(error);
+			} else {
+				if(changes.shouldPullAgain == true){
+					
+					var count_py = python_lookup(PATH);
+					var count_js = js_lookup(PATH);
+					var count_cplus = cplus_lookup(PATH);
+					var count_erl = erlang_lookup(PATH);
+					var count_scala = scala_lookup(PATH);
+					var count_html = html_lookup(PATH);
+					var count_css = css_lookup(PATH);
+					var count_java = java_lookup(PATH);
+					var count_perl = perl_lookup(PATH);
+					var count_ruby = ruby_lookup(PATH);
+					var count_go = go_lookup(PATH);
+					var count_cs = csharp_lookup(PATH);					
+					
+					timeoutSet();
+				}
+			}
+		});
+	};
+
 	(function poll(){
 	   setTimeout(function(){
-	      $.ajax({ url: "server", success: function(data){
-	        //Update your dashboard gauge
-	        salesGauge.setValue(data.value);
+	   	console.log("checking");
+	   	checkStatus();
+	   	
+	   	// Refresh our counts
+	   	counts = [];
 
+	   	// Call recurvisely
+	   	poll();
 
-	        
-	        poll();
-	      }, dataType: "json"});
 	  }, 30000);
 	})();
-*/
 
 });
