@@ -9,8 +9,8 @@
 */
 
 // Local Config //
-var client_key = "INSERT_KEY_HERE";
-var client_secret = "INSERT_SECRET_KEY_HERE";
+var client_key = "i5hqf16ikib2g8b";
+var client_secret = "it274uz2nqryp01";
 var directory_path = "/Developer";
 
 // Highchart Config //

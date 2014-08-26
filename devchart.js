@@ -14,7 +14,6 @@ $("head").append('<script type="text/javascript" src="config.js"></script>');
 $(document).ready(function () {
 	var client = new Dropbox.Client({key: client_key, secret: client_secret});
 
-
 	/* Relative Globals */
 	var counts = [];
 	var PATH = directory_path;
@@ -33,15 +32,61 @@ $(document).ready(function () {
 		});
 	};
 
+	(function poll(){
+	   setTimeout(function(){
+	   	console.log("Checking...");
+	   	checkStatus();
+	   	
+	   	// Refresh our counts
+	   	counts = [];
+
+	   	// Call recurvisely
+	   	poll();
+
+	  }, 30000);
+	})();
+
+	function checkStatus(){
+		var status = true;
+		client.delta(false, function(error, changes){
+			if(error){
+				return showError(error);
+			} else {
+				if(changes.shouldPullAgain == true){
+					
+					timeoutSet();
+
+					python_lookup(PATH);
+					js_lookup(PATH);
+					cplus_lookup(PATH);
+					erlang_lookup(PATH);
+					scala_lookup(PATH);
+					html_lookup(PATH);
+					css_lookup(PATH);
+					java_lookup(PATH);
+					perl_lookup(PATH);
+					ruby_lookup(PATH);
+					go_lookup(PATH);
+					csharp_lookup(PATH);					
+
+				}
+				else if (changes.shouldPullAgain == false){
+					return;
+				}
+				else {
+					return;
+				}
+			}
+		});
+	};
+
 	/* Get Account Info if we really want it */
 	function accountInfo(){
 		client.getAccountInfo(function(error, accountInfo) {
 		if(error){
 			return showError(error);
 		}
-		
-		console.log(accountInfo);
-		
+		var account_info = accountInfo	
 		});
 	};
 
@@ -58,6 +103,27 @@ $(document).ready(function () {
 		});
 	};
 
+	function timeoutSet() {
+		setTimeout(function(){
+
+			var name = Array();
+			var data = Array();
+			var dataArrayFinal = Array();
+
+			for(var i = 0; i < counts.length; i++) { 
+			   name[i] = counts[i].name; 
+			   data[i] = counts[i].value;  
+			}
+
+			for(var j = 0; j < name.length; j++) { 
+			   var temp = new Array(name[j], data[j]); 
+			   dataArrayFinal[j] = temp;     
+			}
+
+			constructGraph(dataArrayFinal);
+
+		},5000);
+	};
 
 	function constructGraph(dataArrayFinal) {
 	    $('#container').highcharts({
@@ -92,33 +158,12 @@ $(document).ready(function () {
 	    });
 	};
 
-	/* This is hacky and gross */
-	function timeoutSet() {
-		setTimeout(function(){
-
-			var name = Array();
-			var data = Array();
-			var dataArrayFinal = Array();
-			for(var i = 0; i < counts.length; i++) { 
-			   name[i] = counts[i].name; 
-			   data[i] = counts[i].value;  
-			}
-
-			for(var j = 0; j < name.length; j++) { 
-			   var temp = new Array(name[j],data[j]); 
-			   dataArrayFinal[j] = temp;     
-			}
-			
-			constructGraph(dataArrayFinal);
-
-		},6000);
-	};
-
 	function python_lookup(directory_path){
 		client.search(PATH, ".py", function(error, count){
 			if(error){ 
 				return showError(error);
 			}
+			console.log("py"+count.length);
 			counts.push({"name": "Python", "value": count.length});
 		});
 	};
@@ -128,6 +173,7 @@ $(document).ready(function () {
 			if(error){ 
 				return showError(error);
 			}
+			console.log("js"+count.length);
 			counts.push({"name": "JavaScript", "value": count.length});
 		});
 	};
@@ -139,6 +185,7 @@ $(document).ready(function () {
 			} else if (count.length == 0 || count.length == null) {
 				return;
 			} else {
+				console.log("cpp"+count.length);
 				counts.push({"name": "C++ (.cpp)", "value": count.length});
 			}
 		});
@@ -148,6 +195,7 @@ $(document).ready(function () {
 			} else if (count.length == 0 || count.length == null) {
 				return;
 			} else {
+				console.log("h"+count.length);
 				counts.push({"name": "C++ (.h)", "value": count.length});
 			}
 		});
@@ -158,9 +206,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No erlang in here!");
 				return;
 			} else {
+				console.log("erl"+count.length);
 				counts.push({"name": "Erlang", "value": count.length});
 			}
 		});
@@ -171,9 +219,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No HTML in here!");
 				return;
 			} else {
+				console.log("html"+count.length);
 				counts.push({"name": "HTML", "value": count.length});
 			}
 		});
@@ -184,9 +232,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No HTML in here!");
 				return;
 			} else {
+				console.log("css"+count.length);
 				counts.push({"name": "CSS", "value": count.length});
 			}
 		});
@@ -197,9 +245,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No Scala in here!");
 				return;
 			} else {
+				console.log("scala"+count.length);
 				counts.push({"name": "Scala", "value": count.length});
 			}
 		});	
@@ -210,9 +258,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No Java in here!");
 				return;
 			} else {
+				console.log("java"+count.length);
 				counts.push({"name": "Java", "value": count.length});
 			}
 		});	
@@ -223,9 +271,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No PHP in here!");
 				return;
 			} else {
+				console.log("php"+count.length);
 				counts.push({"name": "PHP", "value": count.length});
 			}
 		});			
@@ -236,9 +284,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No Perl in here!");
 				return;
 			} else {
+				console.log("perl"+count.length);
 				counts.push({"name": "Perl", "value": count.length});
 			}
 		});			
@@ -249,9 +297,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No Ruby in here!");
 				return;
 			} else {
+				console.log("rb"+count.length);
 				counts.push({"name": "Ruby", "value": count.length});
 			}
 		});		
@@ -262,9 +310,9 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No Go in here!");
 				return;
 			} else {
+				console.log("go"+count.length);
 				counts.push({"name": "Go", "value": count.length});
 			}
 		});		
@@ -275,55 +323,13 @@ $(document).ready(function () {
 			if(error){
 				return showError(error);
 			} else if (count.length == 0 || count.length == null) {
-				console.log("No C# in here!");
 				return;
 			} else {
+				console.log("c#"+count.length);
 				counts.push({"name": "C#", "value": count.length});
 			}
 		});		
 	}
 
 	/******************************************************/
-
-	function checkStatus(){
-		var status = true;
-		client.delta(false, function(error, changes){
-			if(error){
-				return showError(error);
-			} else {
-				if(changes.shouldPullAgain == true){
-					
-					var count_py = python_lookup(PATH);
-					var count_js = js_lookup(PATH);
-					var count_cplus = cplus_lookup(PATH);
-					var count_erl = erlang_lookup(PATH);
-					var count_scala = scala_lookup(PATH);
-					var count_html = html_lookup(PATH);
-					var count_css = css_lookup(PATH);
-					var count_java = java_lookup(PATH);
-					var count_perl = perl_lookup(PATH);
-					var count_ruby = ruby_lookup(PATH);
-					var count_go = go_lookup(PATH);
-					var count_cs = csharp_lookup(PATH);					
-					
-					timeoutSet();
-				}
-			}
-		});
-	};
-
-	(function poll(){
-	   setTimeout(function(){
-	   	console.log("checking");
-	   	checkStatus();
-	   	
-	   	// Refresh our counts
-	   	counts = [];
-
-	   	// Call recurvisely
-	   	poll();
-
-	  }, 30000);
-	})();
-
 });
